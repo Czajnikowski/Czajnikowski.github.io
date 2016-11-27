@@ -1,26 +1,24 @@
 # SITE CONFIGURATION
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://example.com" # the base hostname & protocol for your site
+url: "http://mczarnik.com" # the base hostname & protocol for your site
 
 # THEME-SPECIFIC CONFIGURATION
 theme_settings:
   # Meta
-  title: Type Theme
+  title: Maciek Czarnik
   avatar: avatar.png
   gravatar: # Email MD5 hash
-  description: "A website with blog posts and pages" # used by search engines
+  description: "Swift iOS Development blog by Maciek Czarnik aka Czajnikowski" # used by search engines
 
   # Header and footer text
   header_text: >
-     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-
-     <p>Remove all header text in <code>_config.yml</code> to disable this feature.</p>
+     <p>iOS Development blog by Maciek Czarnik aka Czajnikowski</p>
   header_text_feature_image:
   footer_text: >
    Powered by <a href="http://jekyllrb.com">Jekyll</a> with <a href="https://rohanchandra.github.io/project/type/">Type Theme</a>
 
   # Icons
-  email_address: czajnikowski@gmail.com
+  email_address: hello@mczarnik.com
   behance:
   bitbucket:
   dribbble:
@@ -41,14 +39,14 @@ theme_settings:
   rss: true
 
   # Scripts
-  google_analytics: # Tracking ID, e.g. "UA-000000-01"
-  disqus_shortname:
+  google_analytics: "UA-88068278-1"
+  disqus_shortname: mczarnik
   muut_community_name: # From muut.com settings, e.g. "muttcommunityname"
-  katex: true # Enable if using math markup
+  katex: false # Enable if using math markup
 
   # Localization strings
-  str_follow_on: "Follow on"
-  str_rss_follow: "Follow RSS feed"
+  str_follow_on: "Follow me on"
+  str_rss_follow: "RSS feed"
   str_email: "Email"
   str_next: "Next"
   str_prev: "Prev"

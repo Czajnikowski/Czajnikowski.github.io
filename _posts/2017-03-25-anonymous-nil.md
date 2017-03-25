@@ -106,4 +106,6 @@ func perform(wrappedAnimation: WrappedAnimation) {
 }
 {% endhighlight %}
 
-You can easily adapt this solution to be generic or use parameters in unwrapped method. The example here is contrived and oversimplified, but many codebases have this issue and my goal was to sensitize you to this subtle problem and propose a solution.
+You can easily adapt this solution to be generic or use parameters in unwrapped method.
+
+The example here is contrived and oversimplified, but I hope I've highlighted an issue and sensitize you to this subtle problem.

@@ -5,7 +5,7 @@ title: Anonymous nil
 
 Anonymous `nil` is a subtle code smell that is present in many codebases. What is it? Why is it a problem? How can we solve it?
 
-Let's take a brief, and very contrived example. Let's say there is a method in your codebase that shows view with an animation.
+Let's take a brief, made up and very contrived example. Let's say there is a method in your codebase that shows view with an animation.
 
 {% highlight swift %}
 func show(withAnimation animation: Animation?)
@@ -32,7 +32,7 @@ Whatever way you decided to follow the answer is:
 
 > "If you pass `nil` to this method your view will be presented with animation, that starts from the bottom of the screen."
 
-![Why?]({{ site.url }}/img/why.jpg)
+![Why?]({{ site.url }}/img/why.jpg){: .center-image }
 
 Obvious, right? No, it's not obvious. It's not even logical. It's because the example is very contrived, but I hope you get what the problem is.
 

@@ -1,3 +1,8 @@
+.center-image {
+    margin: 0 auto;
+    display: block;
+}
+
 article,
 .comments {
   @extend %padding-regular;

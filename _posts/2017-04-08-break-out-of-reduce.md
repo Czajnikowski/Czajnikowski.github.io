@@ -17,7 +17,7 @@ reduce(initialValue) {
 }
 {% endhighlight %}
 
-In my post I'm gonna show you how I've implemented it as an extension method on `Sequence`. For TL;DR jump to the last code snippet or check out my playground [here](https://github.com/Czajnikowski/Playgrounds).
+In my post I'm gonna show you how I've implemented it as an extension method on `Sequence`. For TL;DR jump to the <a href="#hereItIs">last section of the post</a> or check out my playground [here](https://github.com/Czajnikowski/Playgrounds).
 
 #### We can do this:
 {: style="text-align: center;"}
@@ -91,7 +91,7 @@ enum BreakConditionError<Result>: Error {
 
 To finish it let's have a full-fledged implementation, that allows us to make a "break it or make it" decision not only based on the partial result, but on the current element of the collection as well (although if it's gonna be sth like `element == someThing` you should rather use `prefix(while:)` before `reduce`).
 
-#### Here it is:
+#### <a name="hereItIs">Here it is:</a>
 {: style="text-align: center;"}
 
 {% highlight swift %}

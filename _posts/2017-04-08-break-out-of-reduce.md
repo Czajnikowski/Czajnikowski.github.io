@@ -43,6 +43,8 @@ That's better!
 Let's see how we can implement it. The original reduce method is implemented on the `Sequence` protocol, so let's put an overload in the extension:
 
 {% highlight swift %}
+import Foundation
+
 extension Sequence {
     func reduce<Result>(
         _ initialResult: Result,
@@ -154,7 +156,7 @@ extension Sequence {
 It gives a different result, so you can use it when you don't want to include the element above condition (as it is a case in `until` variation):
 
 {% highlight swift %}
-(1 ... 5).reduce(0, +, while: { result in result < 5}) // Returns 3
+(1 ... 5).reduce(0, +, while: { result in result < 5 }) // Returns 3
 {% endhighlight swift %}
 
 #### So that's it!

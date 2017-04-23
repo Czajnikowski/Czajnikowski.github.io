@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Break Out of reduce
+title: Break Out of reduce()
 ---
 
-`reduce` is a very useful method in Swift Standard Library. It works like a `for in` loop ([it is the one in fact](https://github.com/apple/swift/blob/master/stdlib/public/core/SequenceAlgorithms.swift.gyb#L616)), but it's designed specifically to calculate a single value out of the elements in the collection... There is only one difference.
+`reduce()` is a very useful method in Swift Standard Library. It works like a `for in` loop ([it is the one in fact](https://github.com/apple/swift/blob/master/stdlib/public/core/SequenceAlgorithms.swift.gyb#L616)), but it's designed specifically to calculate a single value out of the elements in the collection... There is only one difference.
 
 #### We cannot do this:
 {: style="text-align: center;"}
@@ -17,7 +17,7 @@ reduce(initialValue) {
 }
 {% endhighlight %}
 
-In my post I'm gonna show you how I've implemented it as an extension method on `Sequence`. For TL;DR jump to the <a href="#hereItIs">last section of the post</a> or check out my playground [here](https://github.com/Czajnikowski/Playgrounds).
+This post is actually inspired by a [question](http://stackoverflow.com/questions/29906765/is-there-a-way-to-break-from-an-arrays-reduce-function-in-swift) on Stack Overflow and I'm gonna show you how I've implemented it as an extension method on `Sequence`. For TL;DR jump to the <a href="#hereItIs">last section of the post</a> or check out my playground [here](https://github.com/Czajnikowski/Playgrounds).
 
 #### We can do this:
 {: style="text-align: center;"}

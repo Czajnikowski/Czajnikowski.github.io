@@ -3,18 +3,19 @@ layout: post
 title: SUBQUERY Is Not That Scary
 ---
 
-Let's say that you're new in the project. After short onboarding you are getting your first task, here it is.
+Let's say that you're new in the project. After short onboarding you are getting your first task, here it is:
 
 > Add search functionality to the contacts
 
 In description you see:
 
-> Search results should include all contacts that match the search query in properties:
+> Search results should include all contacts that match the search query by:
+>
 >  - name
 >  - surname
 >  - city
 
-Ok, you already know some Core Data, `NSFetchedResultsController` is ready in place, all delegate methods are implemented. You just need to supply a `NSFetchRequest` - what can be easier than that?
+Ok, UI with all delegate methods is implemented, you know some Core Data, `NSFetchedResultsController` is already in place, you just need to supply a `NSFetchRequest` - what can be easier than that?
 
 #### Nothing easier than that
 {: style="text-align: center;"}
@@ -44,7 +45,7 @@ fetchRequest.predicate = NSCompoundPredicate(
 
 `** Terminating app due to uncaught exception 'NSUnknownKeyException', reason: '[<NSDictionaryMapNode 0x608002079b40> valueForUndefinedKey:]: this class is not key value coding-compliant for the key city.'`
 
-Aaaaa... not that fast. `city` is not a property of a `Contact`. Additionally - single contact can have multiple addresses - they are all placed in a relation `addresses`. Actually you'd be safe and figure it out earlier if you'd use a [#keyPath expression](https://medium.com/the-traveled-ios-developers-guide/swift-3-keypath-7a3cf41e603e) (you definitely should).
+Aaaaa... not that fast. `city` is not a property of a `Contact`. Actually you'd be safe and figured it out earlier if you'd use a [#keyPath expression](https://medium.com/the-traveled-ios-developers-guide/swift-3-keypath-7a3cf41e603e) (you definitely should), but that's not my goal in this post. We need to dig deeper. 
 
 #### Ok, so here's the model
 {: style="text-align: center;"}
@@ -62,17 +63,21 @@ public class Address: NSManagedObject {
 }
 {% endhighlight %}
 
-This is exactly the situation where a predicate with a `SUBQUERY` comes handy and is the best possible performance-wise solution (see comparison of results using two other ways you can have). But `SUBQUERY` for many people is an obscure thing and no one really knows how does it work, right? Actually the concept behind it is very simple - `SUBQUERY` is a kind of an inner loop (or an inner filter) that works deep down in the Core Data stack to work out a set of objects that match a given criteria.
+So `city` is a property of the `Address` entity. Additionally single contact can have multiple addresses - they are all placed in the `addresses` relation.
 
-#### What we need in our task
+Our `NSFetchRequest` is configured to iterate over (and return) `Contact` objects, so with a regular `NSCompoundPredicate(orPredicateWithSubpredicates: [..., NSPredicate("SELF.city == %@")]` we cannot achieve what we need. We need to iterate over all `addresses`. We need some kind of predicate that within a given `Contact` will iterate over all addresses to decide if any of them matches our search query (via `city` property). This is exactly the situation where a predicate with a `SUBQUERY` comes handy and is the best possible performance-wise solution (see comparison of results using two other ways you in [my playground](https://github.com/Czajnikowski/Playgrounds/tree/master/Subquery.playground)).
+
+For many people `SUBQUERY` is an obscure topic but actually the concept behind it is very simple - `SUBQUERY` is a kind of an inner loop (or an inner filter) that works [deep down in the Core Data stack](https://www.objc.io/issues/4-core-data/core-data-fetch-requests/) to work out a set of objects that matches a given criteria.
+
+#### How to understand it?
 {: style="text-align: center;"}
 
-Let's for a moment step back from managed objects and Core Data stack and see what logic do we need to have in place to get the results we expect. Let's also simplify our task a bit and focus on the hard part - matching against `city` in the `addresses` relation.
+Let's for a moment step back from managed objects and Core Data and see what logic do we need to have in place to get the results we expect. Let's also simplify our task a bit and focus on the hard part - matching against `city` in the `addresses` relation.
 
 Our goal is to find all contacts that have address which city matches our query, so if we'd work on a regular collection the most basic and explicit implementation we can imagine is:
 
 {% highlight swift %}
-1  let contacts: [Contact] = [...]
+1  let contacts: [Contact] = ...
 2
 3  var results = [Contact]()
 4  for contact in contacts {
@@ -83,50 +88,76 @@ Our goal is to find all contacts that have address which city matches our query,
 9          }
 10     }
 11
-12     if addressesMatchingQuery.count > 0 {
-13         results.append(contact)
-14     }
-15 }
+12     addressesMatchingQuery.count > 0 ? results.append(contact) 
+13 }
 {% endhighlight %}
 
-#### Let's review some interesting parts
+#### Let's rewrite it a bit
 {: style="text-align: center;"}
 
-In lines 1-3 we define our collection to be filtered and create initial set of results. In lines 4-15 there is actual filtering. As we don't match against any property of the contact itself we create another loop that will be matching against properties of the address objects in addresses relation need to dig deeper and filter a relation. where line 6 is our predicate. Yes, this is filtering, so why not use `filter` here? Let's rewrite it like this:
+In lines 1-3 we define our collection to be filtered and create initial set of results. We expect a `results` collection to be a subset of `contacts`, so we may simplify our code by applying a `filter` method. Let's rewrite it like this:
 
 {% highlight swift %}
-1 let contacts: [Contact] = [...]
+1  let contacts: [Contact] = ...
+2
+3  let results = contacts.filter { contact in
+4      var addressesMatchingQuery = [Address]()
+5      for address in contact.addresses {
+6          if address.city == searchQuery {
+7              addressesMatchingQuery.append(address)
+8          }
+9      }
+10
+11     return addressesMatchingQuery.count > 0
+12 }
+{% endhighlight %}
+
+
+In lines 4-9 we have the same kind of situation again - we have an inner filter here - we expect to get a subset of `contact.addresses` into `addressesMatchingQuery` based on the value of the expression in line 6. Let's use a `filter` method again:
+
+{% highlight swift %}
+1 let contacts: [Contact] = ...
 2
 3 let results = contacts.filter { contact in
-4     for address in contact.addresses {
-5         return address.city == searchQuery
+4     let addressesMatchingQuery = contact.addresses.filter { address in
+5         address.city == searchQuery
 6     }
 7
-8     return false
+8     return addressesMatchingQuery.count > 0
 9 }
 {% endhighlight %}
 
-It looks good for now. Actually there is another, inner filter in lines, and we can rewrite it to look like this:
+Let's take it to the extreme and compact it even more:
 
 {% highlight swift %}
-1 let contacts: [Contact] = [...]
+1 let contacts: [Contact] = ...
 2
-3 results = contacts.filter { contact in
+3 let results = contacts.filter { contact in
 4     contact.addresses.filter { address in
 5         address.city == searchQuery
 6     }.count > 0
-7 }
+9 }
 {% endhighlight %}
 
-This is pretty clear - return all contacts that have some address which city is equal to `searchQuery`. Great our goal is achieved, so let's get back to `NSManagedObjects` and Core Data and see how we can leverage `SUBQUERY` to achieve the same goal while ensuring peak performance.
+Great, this is pretty clear - return all contacts that have more than zero addresses which `city` property is equal to `searchQuery`. Let's leave it like this and now get back to our `NSFetchRequest` and Core Data and see how our implementation actually matches what `SUBQUERY` has to offer.
 
-The implementation that we left of is equivalent and syntactically close to what we want to achieve with `SUBQUERY`. Let's give our code some specific layout and see them side by side:
-
-![Double Filter Vs SUBQUERY]({{ site.url }}/img/subquery.jpg){: .center-image }
-
-#### How does one relate to each other
+#### How does one relate to another?
 {: style="text-align: center;"}
 
-Fetch request returns a list of contacts. If it has an associated predicate it filters all contacts and returns only contacts that satisfy a given predicate. If predicate has a `SUBQUERY` the framework creates an inner filter. Filter is executed against objects from a given relation (first parameter of the `SUBQUERY`). To be able to filter objects in a relation framework needs to define a variable (second parameter of the `SUBQUERY` that starts with `$` - equivalent of `address` parameter in the closure) that is used then to define a predicate that is finally used to filter all the objects from the relation.
+This is a `SUBQUERY` that is **functionally equivalent** to our non Core Data implementation (if applied to our `NSPredicate`).
 
-Thanks to great post that helped me set up a Playground https://www.andrewcbancroft.com/2016/07/10/using-a-core-data-model-in-swift-playgrounds/
+{% highlight swift %}
+"SUBQUERY(addresses, $address, $address.city ==[cd] \"\(searchQuery)\").@count > 0"
+{% endhighlight %}
+
+The first parameter of the `SUBQUERY` is a relation name, second one is a temporary variable name that is used to define a predicate - a third parameter - that is used to match against every object from the relation. And yes - second parameter doesn't need to be named `$x`.
+
+There is a reason why I've taken you through that non Core Data implementation and then shown you this. That's because two constructs are doing the same thing and are **almost identical syntactically**. If we give our code some specific layout we can see it more clearly (be sure to zoom in the image below):
+
+<img id="myImg" src="{{ site.baseurl }}/img/subquery.jpg" alt="Double Filter Vs SUBQUERY">
+
+So a `SUBQUERY` behaves like an inner filter that works on a relation configured as a first parameter, variable (that starts with the `$` symbol) that is equivalent to the parameter of the inner `filter`'s closure, and the predicate/condition that is built upon that variable.
+
+I bet you can easily tweak our initial implementation now to leverage `SUBQUERY` and make a good first impression on your new team colleagues. Sometimes things are really simple, but it all depends on the right perspective.
+
+If you want to play with the code, or see the banchmark of three different strategies of matching that I've mentioned before you can find my playground [here](https://github.com/Czajnikowski/Playgrounds/tree/master/Subquery.playground).

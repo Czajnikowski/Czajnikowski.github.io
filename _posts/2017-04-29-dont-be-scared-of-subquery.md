@@ -118,7 +118,7 @@ It looks good for now. Actually there is another, inner filter in lines, and we 
 7 }
 {% endhighlight %}
 
-This is pretty clear - return all contacts that have some address which city is equal to `searchQuery`. Great our goal is achieved, so let's get back to `NSManagedObjects` and Core Data and see how we can leverage `SUBQUERY` to achieve the same goal while ensuring peak performance.
+This is pretty clear - return all contacts that have some address which city is equal to `searchQuery`. Great our goal is achieved, so let's get back to `NSManagedObject`s and Core Data and see how we can leverage `SUBQUERY` to achieve the same goal while ensuring peak performance.
 
 The implementation that we left of is equivalent and syntactically close to what we want to achieve with `SUBQUERY`. Let's give our code some specific layout and see them side by side:
 

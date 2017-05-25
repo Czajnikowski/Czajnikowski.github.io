@@ -15,10 +15,10 @@ In description you see:
 >  - surname
 >  - city
 
-Ok, UI with all delegate methods is implemented, you know some Core Data, `NSFetchedResultsController` is already in place, you just need to supply a `NSFetchRequest` - what can be easier than that?
-
 #### Nothing easier than that
 {: style="text-align: center;"}
+
+UI with all delegate methods is implemented, you know some Core Data, `NSFetchedResultsController` is already in place, you just need to supply a `NSFetchRequest` - what can be easier than that?
 
 {% highlight swift %}
 let fetchRequest = NSFetchRequest<Contact>(
@@ -45,7 +45,7 @@ fetchRequest.predicate = NSCompoundPredicate(
 
 `** Terminating app due to uncaught exception 'NSUnknownKeyException', reason: '[<NSDictionaryMapNode 0x608002079b40> valueForUndefinedKey:]: this class is not key value coding-compliant for the key city.'`
 
-Aaaaa... not that fast. `city` is not a property of a `Contact`. Actually you'd be safe and figured it out earlier if you'd use a [#keyPath expression](https://medium.com/the-traveled-ios-developers-guide/swift-3-keypath-7a3cf41e603e) (you definitely should), but that's not my goal in this post. We need to dig deeper. 
+Aaaaa... not that fast. `city` is not a property of a `Contact`. Actually you'd be safe and figured it out earlier if you'd use a [#keyPath expression](https://medium.com/the-traveled-ios-developers-guide/swift-3-keypath-7a3cf41e603e) (you definitely should), but that's not my goal in this post. We need to dig a bit deeper. 
 
 #### Ok, so here's the model
 {: style="text-align: center;"}
@@ -150,7 +150,7 @@ This is a `SUBQUERY` that is **functionally equivalent** to our non Core Data im
 "SUBQUERY(addresses, $address, $address.city ==[cd] \"\(searchQuery)\").@count > 0"
 {% endhighlight %}
 
-The first parameter of the `SUBQUERY` is a relation name, second one is a temporary variable name that is used to define a predicate - a third parameter - that is used to match against every object from the relation. And yes - second parameter doesn't need to be named `$x`.
+The first parameter of the `SUBQUERY` is a relation name, second one is a temporary variable name that is used to define a predicate - a third parameter - that is used to match against every object from the relation (and yes - second parameter doesn't need to be named `$x`).
 
 There is a reason why I've taken you through that non Core Data implementation and then shown you this. That's because two constructs are doing the same thing and are **almost identical syntactically**. If we give our code some specific layout we can see it more clearly (be sure to zoom in the image below):
 

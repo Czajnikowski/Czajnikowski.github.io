@@ -5,7 +5,7 @@ permalink: /about/
 feature-img: "img/sample_feature_img_2.png"
 ---
 
-My name is Maciek. I do iOS since 2010 and mobile since 2005 (Symbian S60).
+I do iOS since 2010 and mobile since 2005 (Symbian S60).
 
 Currently I focus on continuously delivering **decoupled UI layers** for iOS apps. It's a pretty innovative approach to software development that relies on creating strict border between UI layer and underlying business logic and developing them independently.
 

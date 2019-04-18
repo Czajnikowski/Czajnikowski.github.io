@@ -7,7 +7,7 @@ feature-img: "img/sample_feature_img_2.png"
 
 I do iOS since 2010 and mobile since 2005 (Symbian S60).
 
-Currently I focus on continuously delivering **decoupled UI layers** for iOS apps. It’s a pretty innovative approach to software development that relies on creating a strict border between UI and underlying business logic with very minimal interface in between. Such separation provides freedom to develop both layers by separate entities.
+Currently I focus on continuously delivering **decoupled UI layers** for iOS apps. It’s a pretty innovative approach to software development that relies on maintaining a strict border between UI and underlying business logic with very concise interface in between. Such separation provides freedom to develop both layers by separate entities.
 
 I firmly believe that such modularisation is a good way to decrease the complexity of software projects, scale teams, fill the personnel gaps and it allows teams to build extendable and changeable apps with lots of benefits arising from the specialization.
 
